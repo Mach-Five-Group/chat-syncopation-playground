@@ -1,0 +1,243 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Machvive Chat Syncopation — playground</title>
+  <meta name="description" content="Every component in the Machvive Chat Syncopation collection, running in the browser.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>💬</text></svg>">
+  <script type="module" crossorigin src="./assets/index-BS3O5nSB.js"></script>
+  <link rel="stylesheet" crossorigin href="./assets/index-B7BomHI_.css">
+</head>
+<body>
+  <header class="page-header">
+    <h1>Machvive Chat Syncopation</h1>
+    <p class="lede">
+      Dependency-free web components for chat interfaces. Everything below is running
+      live — no model, no server. The default transport echoes you back, which is the
+      point: the whole surface is finishable before a model exists.
+    </p>
+    <nav class="controls" aria-label="Playground controls">
+      <label>
+        Theme
+        <select id="theme">
+          <option value="">auto (OS)</option>
+          <option value="light">light</option>
+          <option value="dark">dark</option>
+        </select>
+      </label>
+      <label>
+        Transport
+        <select id="transport">
+          <option value="echo">echo</option>
+          <option value="scripted">scripted (streams prose)</option>
+        </select>
+      </label>
+      <label>
+        Accent
+        <input type="color" id="accent" value="#1565c0">
+      </label>
+      <label>
+        Radius
+        <input type="range" id="radius" min="0" max="24" value="12">
+      </label>
+      <button type="button" id="reset">Reset</button>
+    </nav>
+    <p class="links">
+      <a href="https://www.npmjs.com/package/@machfivetechchicago/machvive-chat-syncopation-ai">npm</a>
+      <a href="https://github.com/Mach-Five-Group/machvive-chat-syncopation-ai">source</a>
+      <a href="https://github.com/Mach-Five-Group/machvive-chat-syncopation-ai/wiki">wiki</a>
+    </p>
+  </header>
+
+  <main>
+    <section id="minimal">
+      <h2>The smallest working surface</h2>
+      <p>
+        One tag. It creates its own services element, so a single element on the page
+        is a working chat. Type something and press Enter.
+      </p>
+      <machvive-chat-syncopation class="demo">
+        <machvive-chat-syncopation-canvas></machvive-chat-syncopation-canvas>
+        <machvive-chat-syncopation-prompt slot="footer"></machvive-chat-syncopation-prompt>
+      </machvive-chat-syncopation>
+      <details>
+        <summary>Markup</summary>
+<pre><code>&lt;machvive-chat-syncopation&gt;
+  &lt;machvive-chat-syncopation-canvas&gt;&lt;/machvive-chat-syncopation-canvas&gt;
+  &lt;machvive-chat-syncopation-prompt slot="footer"&gt;&lt;/machvive-chat-syncopation-prompt&gt;
+&lt;/machvive-chat-syncopation&gt;</code></pre>
+      </details>
+    </section>
+
+    <section id="support">
+      <h2>A support surface</h2>
+      <p>
+        Suggested openings for the empty state, because an empty prompt box is the
+        highest-friction moment in any chat interface. Click a chip — it fills the
+        composer rather than sending, so you stay the author of your own message.
+      </p>
+      <machvive-chat-syncopation-services id="support-services" transport="echo">
+        <machvive-chat-syncopation class="demo">
+          <h3 slot="header">Support</h3>
+          <machvive-chat-syncopation-nudge
+            suggestions="Where's my order?|I'd like to return something|Talk to a human"
+            idle-ms="20000"
+            idle-text="Still here if you need anything."></machvive-chat-syncopation-nudge>
+          <machvive-chat-syncopation-canvas></machvive-chat-syncopation-canvas>
+          <machvive-chat-syncopation-prompt slot="footer" placeholder="How can we help?"></machvive-chat-syncopation-prompt>
+        </machvive-chat-syncopation>
+      </machvive-chat-syncopation-services>
+      <p class="note">
+        Wait 20 seconds without typing to see the idle nudge. It fires once per
+        conversation — a surface that keeps asking whether you are still there is a
+        surface people close.
+      </p>
+    </section>
+
+    <section id="streaming">
+      <h2>Streaming, and interrupting it</h2>
+      <p>
+        Switch the transport above to <strong>scripted</strong> and send anything. The
+        reply streams a paragraph. While it generates, the button is
+        <strong>Stop</strong> — not disabled, because a disabled control leaves you
+        watching output you cannot interrupt. Stopping keeps the partial text you
+        already read.
+      </p>
+      <p>
+        Scroll up mid-stream and the transcript stays where you left it. Autoscroll
+        follows the bottom only while you are already there.
+      </p>
+      <machvive-chat-syncopation-services id="stream-services">
+        <machvive-chat-syncopation class="demo tall">
+          <machvive-chat-syncopation-canvas></machvive-chat-syncopation-canvas>
+          <machvive-chat-syncopation-prompt slot="footer" placeholder="Ask for a long answer…"></machvive-chat-syncopation-prompt>
+        </machvive-chat-syncopation>
+      </machvive-chat-syncopation-services>
+    </section>
+
+    <section id="cli">
+      <h2>A command line instead of a composer</h2>
+      <p>
+        Same conversation, different input surface. Try <code>/help</code>,
+        <code>/clear</code>, <code>/transport</code>, and the Up arrow. Slash commands
+        run locally and never reach the model — <code>/clear</code> is not a prompt.
+      </p>
+      <p>
+        <code>/order 1234</code> is registered from page code, which is how you add
+        domain verbs without forking the component.
+      </p>
+      <machvive-chat-syncopation-services id="cli-services">
+        <machvive-chat-syncopation class="demo">
+          <machvive-chat-syncopation-canvas></machvive-chat-syncopation-canvas>
+          <machvive-chat-syncopation-cli slot="footer"></machvive-chat-syncopation-cli>
+        </machvive-chat-syncopation>
+      </machvive-chat-syncopation-services>
+    </section>
+
+    <section id="voice">
+      <h2>Voice, honestly gated</h2>
+      <p>
+        What your browser cannot do is disabled with the reason shown, rather than
+        rendered as a button that silently does nothing. Dictation fills the composer;
+        it never sends.
+      </p>
+      <machvive-chat-syncopation-services id="voice-services">
+        <machvive-chat-syncopation class="demo">
+          <machvive-chat-syncopation-canvas></machvive-chat-syncopation-canvas>
+          <machvive-chat-syncopation-voice slot="footer"></machvive-chat-syncopation-voice>
+          <machvive-chat-syncopation-prompt slot="footer"></machvive-chat-syncopation-prompt>
+        </machvive-chat-syncopation>
+      </machvive-chat-syncopation-services>
+      <p class="note">
+        <code>SpeechRecognition</code> in most browsers sends audio to a vendor
+        service. It is not local — worth saying out loud if the rest of your surface
+        is private.
+      </p>
+    </section>
+
+    <section id="instruments">
+      <h2>The instruments</h2>
+      <p>
+        The inspector reads the bus and shows topics it was never taught, including
+        the <code>playground:*</code> events this page emits. History lists what is
+        stored and gives it back — export as JSON, or delete it for real.
+      </p>
+      <machvive-chat-syncopation-services id="instrument-services" persist>
+        <div class="split">
+          <machvive-chat-syncopation class="demo">
+            <machvive-chat-syncopation-canvas></machvive-chat-syncopation-canvas>
+            <machvive-chat-syncopation-prompt slot="footer"></machvive-chat-syncopation-prompt>
+          </machvive-chat-syncopation>
+          <div class="stack">
+            <machvive-chat-syncopation-inspector limit="60"></machvive-chat-syncopation-inspector>
+            <machvive-chat-syncopation-history></machvive-chat-syncopation-history>
+          </div>
+        </div>
+      </machvive-chat-syncopation-services>
+      <p class="note">
+        This is the only surface on the page with <code>persist</code> set.
+        Persistence is off by default — storing someone's conversation is a decision a
+        page has to make deliberately.
+      </p>
+    </section>
+
+    <section id="independent">
+      <h2>Two surfaces, no shared state</h2>
+      <p>
+        Components find their services element by walking up the DOM, so nesting is
+        the wiring. There is no registry and no global, which is what makes these two
+        conversations genuinely independent. Type in one; the other does not move.
+      </p>
+      <div class="split">
+        <machvive-chat-syncopation-services>
+          <machvive-chat-syncopation class="demo short">
+            <machvive-chat-syncopation-canvas></machvive-chat-syncopation-canvas>
+            <machvive-chat-syncopation-prompt slot="footer" placeholder="Surface A"></machvive-chat-syncopation-prompt>
+          </machvive-chat-syncopation>
+        </machvive-chat-syncopation-services>
+        <machvive-chat-syncopation-services>
+          <machvive-chat-syncopation class="demo short" theme="dark">
+            <machvive-chat-syncopation-canvas></machvive-chat-syncopation-canvas>
+            <machvive-chat-syncopation-prompt slot="footer" placeholder="Surface B (forced dark)"></machvive-chat-syncopation-prompt>
+          </machvive-chat-syncopation>
+        </machvive-chat-syncopation-services>
+      </div>
+      <p class="note">
+        Surface B sets <code>theme="dark"</code>. An explicit choice wins in either
+        direction — it stays dark in a light OS, and the one next to it stays with
+        your OS preference.
+      </p>
+    </section>
+
+    <section id="roles">
+      <h2>Every role and status</h2>
+      <p>
+        User, assistant, system and tool turns, plus the pending and error states.
+        Error turns are visible on purpose: silently dropping a failed turn leaves
+        someone staring at a prompt that appears to have done nothing.
+      </p>
+      <machvive-chat-syncopation-services id="roles-services">
+        <machvive-chat-syncopation class="demo tall">
+          <machvive-chat-syncopation-canvas></machvive-chat-syncopation-canvas>
+        </machvive-chat-syncopation>
+      </machvive-chat-syncopation-services>
+      <p class="note">
+        The last bubble contains <code>&lt;img src=x onerror=alert(1)&gt;</code>.
+        It renders as those characters — record text goes through
+        <code>textContent</code> everywhere, inspector included, because model output
+        is untrusted input.
+      </p>
+    </section>
+  </main>
+
+  <footer class="page-footer">
+    <p>
+      Apache-2.0 ·
+      <a href="https://github.com/Mach-Five-Group">MachFiveTech Chicago</a> ·
+      <a href="https://www.npmjs.com/package/@machfivetechchicago/machvive-webmcp-ai">machvive-webmcp-ai</a>
+    </p>
+  </footer>
+
+</body>
+</html>
