@@ -28,8 +28,8 @@
       <label>
         Transport
         <select id="transport">
-          <option value="echo">echo</option>
-          <option value="scripted">scripted (streams prose)</option>
+          <option value="lorem" selected>mock replies (lorem ipsum)</option>
+          <option value="echo-only">echo</option>
         </select>
       </label>
       <label>
@@ -97,11 +97,17 @@
     <section id="streaming">
       <h2>Streaming, and interrupting it</h2>
       <p>
-        Switch the transport above to <strong>scripted</strong> and send anything. The
-        reply streams a paragraph. While it generates, the button is
-        <strong>Stop</strong> — not disabled, because a disabled control leaves you
-        watching output you cannot interrupt. Stopping keeps the partial text you
-        already read.
+        Replies come from a transport registered with
+        <code>services.registerTransport('lorem', …)</code> — placeholder copy in
+        business-speak, streamed a token at a time. Lengths vary the way real
+        replies do, which is the point: a transcript of uniformly-sized bubbles
+        makes wrapping, autoscroll and the pending caret all look fine without
+        testing any of them.
+      </p>
+      <p>
+        While a reply generates the button is <strong>Stop</strong> — not disabled,
+        because a disabled control leaves you watching output you cannot interrupt.
+        Stopping keeps the partial text you already read.
       </p>
       <p>
         Scroll up mid-stream and the transcript stays where you left it. Autoscroll

@@ -36,62 +36,75 @@ $('#reset').addEventListener('click', () => {
 
 /* ------------------------------------------------------ a real transport */
 
-const PROSE = `A conversation is a reading surface before it is an input surface.
-That sounds like a small distinction until you watch someone try to read the
-middle of a transcript while new text arrives at the bottom.
-
-Most chat interfaces re-render the whole list on every update. The scroll
-position jumps, a text selection collapses mid-copy, and a screen reader
-re-announces turns the reader already heard. None of that is a model problem,
-and all of it is avoidable: append to one node, and follow the bottom only when
-the reader is already there.
-
-Try scrolling up while this is still arriving. The transcript will stay where
-you left it.`;
+import { loremIpsum, loremSentence } from '@machfivetechchicago/machvive-webmcp-ai';
 
 /**
- * Drives the conversation directly rather than through the daemon, which is the
- * documented escape hatch: the daemon is a convenience, not a requirement.
+ * A mock model.
+ *
+ * Replies vary in shape the way real ones do — a one-line acknowledgement, a
+ * paragraph, occasionally three. That matters more than it sounds: a transcript
+ * of uniformly-sized bubbles makes autoscroll, wrapping and the pending caret
+ * all look fine, and none of them are being tested.
+ *
+ * English business-speak rather than Latin, because that is the register real
+ * product copy is written in and its word lengths are what break a column.
  */
-async function scripted(services, prompt) {
-  const { conversation } = services;
-  conversation.add({ role: 'user', text: prompt });
+function mockReply() {
+  const roll = Math.random();
+  if (roll < 0.2) return loremSentence({ lang: 'english', minWords: 4, maxWords: 9 });
+  if (roll < 0.75) return loremIpsum({ lang: 'english', sentences: -1 });
+  return loremIpsum({ lang: 'english', sentences: 3, paragraphs: 2 + Math.floor(Math.random() * 2) });
+}
 
-  const reply = conversation.add({
-    role: 'assistant', text: '', status: 'pending',
-    meta: { [META.SOURCE]: 'scripted' }
-  });
-
-  const startedAt = Date.now();
-  const words = PROSE.split(/(\s+)/);
-  for (const word of words) {
-    if (services.__stopped) break;
-    await new Promise((r) => setTimeout(r, 18));
-    conversation.append(reply.id, word);
+/**
+ * A transport, registered the supported way.
+ *
+ * Earlier this page intercepted prompt-submit and added records itself, which
+ * produced two replies per message — the mock's and the daemon's — because the
+ * composer sends regardless of who listens. Registering is both correct and
+ * shorter, and it keeps the busy guard, stop() and daemon:idle working, which is
+ * what turns the Stop button back into Send.
+ */
+async function* mockTransport(prompt) {
+  // Split on whitespace but keep it, so separators stream too and the text never
+  // reflows as a word completes.
+  for (const token of mockReply(prompt).split(/(\s+)/)) {
+    // A longer beat after a sentence ends. Uniform timing reads as a progress
+    // bar; varied timing reads as something composing an answer.
+    await new Promise((r) => setTimeout(r, /[.!?]$/.test(token) ? 110 : 16 + Math.random() * 22));
+    yield token;
   }
-  conversation.update(reply.id, {
-    status: 'complete',
-    meta: { ...reply.meta, [META.LATENCY]: Date.now() - startedAt }
-  });
 }
 
 const streamServices = $('#stream-services');
 
+streamServices.registerTransport('lorem', mockTransport);
+
 $('#transport').addEventListener('change', (event) => {
-  const mode = event.target.value;
+  // Every surface on the page follows the picker; they each have their own
+  // services element, so each needs the transport registered on it.
   for (const services of document.querySelectorAll('machvive-chat-syncopation-services')) {
-    services.dataset.mode = mode;
+    if (event.target.value === 'lorem') services.registerTransport('lorem', mockTransport);
+    else services.config.transport = 'echo';
   }
 });
 
-// Intercept submissions on the streaming surface when scripted is selected.
-streamServices.addEventListener('prompt-submit', async (event) => {
-  if ($('#transport').value !== 'scripted') return;
-  // The prompt already cleared its field; the daemon is what we are replacing.
-  event.stopPropagation();
-  streamServices.__stopped = false;
-  await scripted(streamServices, event.detail.text);
-}, true);
+// Seed a conversation so the transcript has something to scroll through. An
+// empty box demonstrates the nudge; a full one demonstrates everything else.
+for (const prompt of [
+  'What does this collection actually give me?',
+  'How would I wire it to a real model?',
+  'And if I want it to run offline?'
+]) {
+  streamServices.conversation.add({ role: 'user', text: prompt });
+  streamServices.conversation.add({
+    role: 'assistant',
+    // Seeded, so the opening transcript is identical on every load and a visual
+    // diff of this page stays meaningful.
+    text: loremIpsum({ lang: 'english', sentences: 3, seed: prompt.length }),
+    meta: { [META.SOURCE]: 'mock' }
+  });
+}
 
 streamServices.bus.on('daemon:idle', () => { streamServices.__stopped = true; });
 
