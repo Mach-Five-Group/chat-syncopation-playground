@@ -6,7 +6,7 @@
   <title>Machvive Chat Syncopation — playground</title>
   <meta name="description" content="Every component in the Machvive Chat Syncopation collection, running in the browser.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'><text y='13' font-size='14'>💬</text></svg>">
-  <script type="module" crossorigin src="./assets/index-BS3O5nSB.js"></script>
+  <script type="module" crossorigin src="./assets/index-CFFcTWdq.js"></script>
   <link rel="stylesheet" crossorigin href="./assets/index-B7BomHI_.css">
 </head>
 <body>
@@ -29,8 +29,8 @@
       <label>
         Transport
         <select id="transport">
-          <option value="echo">echo</option>
-          <option value="scripted">scripted (streams prose)</option>
+          <option value="lorem" selected>mock replies (lorem ipsum)</option>
+          <option value="echo-only">echo</option>
         </select>
       </label>
       <label>
@@ -98,11 +98,17 @@
     <section id="streaming">
       <h2>Streaming, and interrupting it</h2>
       <p>
-        Switch the transport above to <strong>scripted</strong> and send anything. The
-        reply streams a paragraph. While it generates, the button is
-        <strong>Stop</strong> — not disabled, because a disabled control leaves you
-        watching output you cannot interrupt. Stopping keeps the partial text you
-        already read.
+        Replies come from a transport registered with
+        <code>services.registerTransport('lorem', …)</code> — placeholder copy in
+        business-speak, streamed a token at a time. Lengths vary the way real
+        replies do, which is the point: a transcript of uniformly-sized bubbles
+        makes wrapping, autoscroll and the pending caret all look fine without
+        testing any of them.
+      </p>
+      <p>
+        While a reply generates the button is <strong>Stop</strong> — not disabled,
+        because a disabled control leaves you watching output you cannot interrupt.
+        Stopping keeps the partial text you already read.
       </p>
       <p>
         Scroll up mid-stream and the transcript stays where you left it. Autoscroll
